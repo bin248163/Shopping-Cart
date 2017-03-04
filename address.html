@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>配送地址</title>
+		<style>
+			* {margin: 0;padding: 0;}
+			h1{font-weight: normal;text-align: center;font-size: 24px;line-height: 30px;border-bottom: 1px solid #d6d6d6;padding: 20px 15px;margin:60px 0 40px;}
+			#app{width: 1200px;margin: 0 auto 80px;}
+			.ad1 {float: left;width: calc(21% - 42px);margin: 0 2% 20px;border: 1px solid #d6d6d6;height: 200px;padding: 20px;}
+			.ad1 p{font-size: 16px;line-height: 40px;padding: 0 20px;}
+			.ad2 {float: left;line-height: 50px;text-align: center;cursor: pointer;width: calc(46% - 2px);margin: 0 2%;border: 1px solid #d6d6d6;}
+			.bor{border: 1px solid #f00;}
+			.sz{display: none;color: #ff6700;}
+			.ad1:hover .sz{display: block;}
+		</style>
+	</head>
+
+	<body>
+		<div id="app">
+			<h1>配送地址</h1>
+			<div style="overflow: hidden;">
+				<div class="ad1" v-for="(item,index) in filterAddress" v-bind:class={"bor":index==currentIndex} @click="currentIndex=index">
+					<p>{{item.userName}}</p>
+					<p>{{item.streetName}}</p>
+					<p style="padding-top: 15px;">tel:{{item.tel}}</p>
+					<p v-if="!item.isDefault" @click="setDefault(item.addressId)" class="sz">设为默认</p>
+					<p v-if="item.isDefault" style="color: #ff6700;">默认地址</p>
+				</div>
+				<div class="ad1" style="text-align: center;cursor: pointer;">
+					<p style="font-size: 100px;line-height: 120px;">+</p>
+					<p>添加新地址</p>
+				</div>
+			</div>
+			<div style="text-align: center;">
+				<a href="javascript:;" @click="loadMore" style="display: inline-block;width: 100px;line-height: 40px;color: #ff6700;text-decoration: none;">more</a>
+			</div>
+			<h1>配送方式</h1>
+			<div style="overflow: hidden;">
+				<div class="ad2" :class={'bor':ship==1} @click="ship=1">标准配送</div>
+				<div class="ad2" :class={'bor':ship==2} @click="ship=2">高级配送</div>
+			</div>
+		</div>
+	</body>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="http://cdn.bootcss.com/vue-resource/1.2.1/vue-resource.common.js"></script>
+	<script>
+		new Vue({
+			el: '#app',
+			data: {
+				limitNum: 3,
+				addressList: [],
+				currentIndex:0,
+				ship:1
+			},
+			mounted: function() {
+				this.$nextTick(function() {
+					this.getAddressList();
+				});
+			},
+			computed: {
+				filterAddress: function() {
+					return this.addressList.slice(0, this.limitNum);
+				}
+			},
+			methods: {
+				getAddressList: function() {
+					var _this = this;
+					this.$http.get("data/address.json").then(function(response) {
+						var res = response.data;
+						if(res.status == "0") {
+							_this.addressList = res.result;
+						}
+					});
+				},
+				loadMore: function() {
+					this.limitNum = this.addressList.length;
+				},
+				setDefault:function(addressId){
+					this.addressList.forEach(function(address,index){
+						if (address.addressId==addressId) {
+							address.isDefault=true;
+						} else{
+							address.isDefault=false;
+						}
+					});
+				}
+
+			}
+
+		});
+	</script>
+
+</html>

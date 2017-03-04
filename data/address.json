@@ -1,0 +1,47 @@
+{
+	"status":0,
+	"message":"",
+	"result":[
+	          {
+	        	  "addressId":"101",
+	        	  "userName":"yack",
+	        	  "streetName":"beijing",
+	        	  "postCode":"101",
+	        	  "tel":"123123123",
+	        	  "isDefault":true
+	          },
+	          {
+	        	  "addressId":"102",
+	        	  "userName":"yackdasd",
+	        	  "streetName":"beijing",
+	        	  "postCode":"101",
+	        	  "tel":"123123123",
+	        	  "isDefault":false
+	          },
+	          {
+	        	  "addressId":"103",
+	        	  "userName":"yack",
+	        	  "streetName":"beijing",
+	        	  "postCode":"101",
+	        	  "tel":"123123123",
+	        	  "isDefault":false
+	          },
+	          {
+	        	  "addressId":"104",
+	        	  "userName":"yack",
+	        	  "streetName":"beijing",
+	        	  "postCode":"101",
+	        	  "tel":"123123123",
+	        	  "isDefault":false
+	          },
+	          {
+	        	  "addressId":"105",
+	        	  "userName":"yack",
+	        	  "streetName":"beijing",
+	        	  "postCode":"101",
+	        	  "tel":"123123123",
+	        	  "isDefault":false
+	          }
+	          
+	          ]
+}
