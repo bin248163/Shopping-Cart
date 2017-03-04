@@ -9,7 +9,8 @@
 			h1{font-weight: normal;text-align: center;font-size: 24px;line-height: 30px;border-bottom: 1px solid #d6d6d6;padding: 20px 15px;margin:60px 0 40px;}
 			#app{width: 1200px;margin: 0 auto 80px;}
 			.ad1 {float: left;width: calc(21% - 42px);margin: 0 2% 20px;border: 1px solid #d6d6d6;height: 200px;padding: 20px;}
-			.ad1 p{font-size: 16px;line-height: 40px;padding: 0 20px;}
+			.ad1 p,span{font-size: 16px;line-height: 40px;padding: 0 20px;}
+			.ad1 span{cursor: pointer;}
 			.ad2 {float: left;line-height: 50px;text-align: center;cursor: pointer;width: calc(46% - 2px);margin: 0 2%;border: 1px solid #d6d6d6;}
 			.bor{border: 1px solid #f00;}
 			.sz{display: none;color: #ff6700;}
@@ -25,7 +26,7 @@
 					<p>{{item.userName}}</p>
 					<p>{{item.streetName}}</p>
 					<p style="padding-top: 15px;">tel:{{item.tel}}</p>
-					<p v-if="!item.isDefault" @click="setDefault(item.addressId)" class="sz">设为默认</p>
+					<span v-if="!item.isDefault" @click="setDefault(item.addressId)" class="sz">设为默认</span>
 					<p v-if="item.isDefault" style="color: #ff6700;">默认地址</p>
 				</div>
 				<div class="ad1" style="text-align: center;cursor: pointer;">
