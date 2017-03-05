@@ -3,18 +3,149 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>购物车</title>
+		<style type="text/css">
+			*{margin:0;padding: 0;}
+			#app{width: 1200px;margin: 0 auto 80px;}
+			h1{font-weight: normal;text-align: center;font-size: 24px;line-height: 30px;border-bottom: 1px solid #d6d6d6;padding: 20px 15px;margin:60px 0 40px;}
+			.gw1{width: 15px;height: 15px;border-radius: 50%;border: 1px solid #d6d6d6;float: left;margin-top: 43px;}
+			.gw2{float: left;width: 200px;}
+			img{width: 98px;height: 98px;float: left;display: block;margin: 0 20px;border: 1px solid #d6d6d6;}
+			.check{background: #ff6700;border: 1px solid #ff6700;}
+			.tk{width: 600px;height: 300px;text-align: center;opacity:0;position: fixed;z-index: 2;top: 60%;left: 50%;background: #fff;margin-top: -150px;margin-left: -300px;-webkit-transition: all .5s;-o-transition: all .5s;-moz-transition: all .5s;transition: all .5s;}
+			.tk a{text-align: center;display: inline-block;width: 200px;line-height: 40px;border: 1px solid #ff6700;font-size: 16px;color: #ff6700;margin: 0 10px;}
+			.block{top: 50%;opacity: 1;}
+			a{text-decoration: none;color: #444;font-size: 16px;}
+			.zz{background: rgba(0,0,0,.5);position: fixed;width: 100%;height: 100%;z-index: 1;left: 0;top: 0;}
+			.close{position: absolute;right: 14px;top: 10px;width: 24px;height: 24px;cursor: pointer;-webkit-transition: all .5s;-o-transition: all .5s;-moz-transition: all .5s;transition: all .5s;}
+			.close img{width: 100%;height: 100%;margin: 0;border: none;}
+			.close:hover{transform: rotate(90deg);}
+		</style>
 	</head>
 	<body>
 		<div id="app">
-			<p>{{msg}}</p>
+			<h1>购物车</h1>
+			<div style="overflow: hidden;border-bottom: 1px dashed #d6d6d6;padding: 20px;" v-for="item in productList">
+				<div class="gw1" @click="selectProduct(item)" :class="{'check':item.checked}"></div>
+				<img v-bind:src="item.productImage" alt=""/>
+				<div class="gw2">
+					<p style="font-size: 16px;padding-top: 10px;">{{item.productName}}</p>
+					<p style="font-size: 14px;color: #666;padding-top: 25px;line-height: 23px;">赠送：<br /><span v-for="part in item.parts" v-text="part.partsName" style="padding-right:5px;"></span></p>
+				</div>
+				<div style="width: 200px;float: left;line-height: 100px;">{{item.productPrice | formatMoney}}</div>
+				<div style="width: 200px;float: left;padding-top: 40px;">
+					<a href="javascript:;" @click="changeMoney(item,-1)">-</a>
+					<input type="text" id="" value="18" style="display: inline-block;width: 30px;text-align: center;" v-model="item.productQuencity"/>
+					<a href="javascript:;"@click="changeMoney(item,1)">+</a>					
+				</div>
+				<div style="width: 200px;float: left;line-height: 100px;">{{item.productQuencity * item.productPrice | formatMoney}}</div>
+				<div style="width: 200px;float: left;line-height: 100px;cursor: pointer;" @click="delConfirm(item)">删除</div>
+			</div>
+			<div style="overflow: hidden;padding: 20px;">
+				<div style="width: 100px;float: left;padding-top: 14px;color: #ff6700;">
+					<span class="gw1" :class="{'check':checkFlag}" @click="checkAll(true)" style="margin-top: 0;display: inline-block;float: none;margin-right: 10px;"></span>全选
+				</div>			
+				<a href="javascripr:;" @click="checkAll(false)" style="float: left;padding-top: 14px;">取消全选</a>
+				
+				<a href="address.html" style="float: right;width: 200px;line-height: 50px;text-align: center;background: #ff6700;color: #fff;">结账</a>
+				<p style="text-align: right;margin-right: 20px;float: right;padding-top: 14px;">总计：<span>{{totalMoney | formatMoney}}</span></p>
+			</div>
+			<div class="zz" v-if="delFlag"></div>
+			<div class="tk" :class="{'block':delFlag}">
+				<p style="padding: 80px 0 70px;font-size: 16px;">确认删除订单吗？</p>
+				<div>
+					<a href="javascripr:;" @click="delProduct">YES</a>
+					<a href="javascripr:;" @click="delFlag=false" style="color: #fff;background: #ff6700;">NO</a>
+				</div>
+				<div class="close" @click="delFlag=false"><img src="img/2.png" alt="" /></div>
+			</div>
 		</div>
 	</body>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="http://cdn.bootcss.com/vue-resource/1.2.1/vue-resource.common.js"></script>
 	<script>
-		var vm=new Vue({
+		new Vue({
 			el:'#app',
 			data:{
-				msg:'123'
+				productList:[],
+				totalMoney:0,
+				checkFlag:false,
+				delFlag:false,
+				curproduct:''
+			},
+			filters:{//过滤器
+				formatMoney:function(value){
+					return "￥"+value.toFixed(2)+"元";
+				}
+			},
+			mounted:function(){
+				this.$nextTick(function(){
+					this.cartView();
+				});				
+			},
+			methods:{
+				cartView:function(){
+					var _this = this;
+					this.$http.get("data/cartData.json").then(function(res) {
+						_this.productList = res.body.result.List;
+						_this.totalMoney = res.body.result.totalMoney;
+						
+					});
+				},
+				changeMoney:function(product,way){
+					if (way>0) {
+						product.productQuencity++;
+					} else{
+						product.productQuencity--;
+						if(product.productQuencity<1){
+							product.productQuencity=1;
+						}
+						
+					}
+					this.clacTotalPrice();
+				},
+				selectProduct:function(item){
+					if (typeof item.checked=='undefined') {
+						//全局注册
+						//Vue.set(item,"checked",true);
+						//局部注册
+						this.$set(item,"checked",true);
+						
+					} else{
+						item.checked=!item.checked;
+					}
+					this.clacTotalPrice();
+				},
+				checkAll:function(flag){
+					this.checkFlag=flag;
+					var _this=this;
+					this.productList.forEach(function(item,index){
+						if (typeof item.checked=='undefined') {						
+							_this.$set(item,"checked",_this.checkFlag);
+						
+						} else{
+							item.checked=_this.checkFlag;
+						}
+					});
+					this.clacTotalPrice();
+				},
+				clacTotalPrice:function(){
+					var _this=this;
+					this.totalMoney=0;
+					this.productList.forEach(function(item,index){
+						if (item.checked) {						
+							_this.totalMoney+=item.productPrice*item.productQuencity;						
+						}
+					});
+				},
+				delConfirm:function(item){
+					this.delFlag=true;
+					this.curProduct=item;
+				},
+				delProduct:function(){
+					var index=this.productList.indexOf(this.curProduct);
+					this.productList.splice(index,1);
+					this.delFlag=false;
+				}
 			}
 		});
 	</script>
